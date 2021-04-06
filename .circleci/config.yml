@@ -1,13 +1,26 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine. See: https://circleci.com/docs/2.0/configuration-reference
-version: 2.1
-# Use a package of configuration called an orb.
-orbs:
-  # Declare a dependency on the welcome-orb
-  welcome: circleci/welcome-orb@0.4.1
-# Orchestrate or schedule a set of jobs
-workflows:
-  # Name the workflow "welcome"
-  welcome:
-    # Run the welcome/run job in its own container
-    jobs:
-      - welcome/run
+kind: pipeline
+name: Mystic Kernel (MSM-4.4)
+
+steps:
+- name: Building Mystic Kernel
+  image: okta10/docker:debian
+  environment: 
+    TOKED:
+      from_secret: TOKED
+    TELEGRAM_TOKEN:
+      from_secret: TELEGRAM_TOKEN
+    CHANNEL_ID:
+      from_secret: CHANNEL_ID
+
+  commands:
+    - "wget https://raw.githubusercontent.com/okta-10/scripts/main/build-ci/kernel-4.4/doStart"
+    - bash doStart beta
+    - cd kernel
+    - "wget https://raw.githubusercontent.com/okta-10/scripts/main/build-ci/kernel-4.4/doPush"
+    - bash build whyred
+    - bash build a26x
+    - bash build lavender
+    - "wget https://raw.githubusercontent.com/okta-10/scripts/main/patch/oc_4.4.patch"
+    - git apply oc_4.4.patch
+    - bash build whyred oc
+    - bash doPush beta
